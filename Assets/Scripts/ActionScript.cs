@@ -17,7 +17,7 @@ public class ActionScript : MonoBehaviour
     int movementIndex;
     int step;
 
-    public bool TryGetNextAction(out Action move)
+    public bool TryGetNextAction(out Action action)
     {
         // Check move index
         if (movementIndex >= ScriptLines.Length)
@@ -30,17 +30,17 @@ public class ActionScript : MonoBehaviour
             // Otherwise don't move
             else
             {
-                move = Vector3Int.zero;
+                action = Action.Wait;
                 return false;
             }
         }
 
         // Evaluate step
-        var movement = ScriptLines[movementIndex];
-        move = OffsetFromAction[(int)movement.Action];
+        var scriptLine = ScriptLines[movementIndex];
+        action = scriptLine.Action;
 
         // Move onto next move if necessary
-        if (++step >= movement.Iterations)
+        if (++step >= scriptLine.Iterations)
         {
             step = 0;
             movementIndex++;
@@ -55,12 +55,4 @@ public struct ScriptLine
 {
     public int Iterations;
     public Action Action;
-}
-
-[Serializable]
-public enum Action
-{
-    Up, Down,
-    Left, Right,
-    Wait
 }

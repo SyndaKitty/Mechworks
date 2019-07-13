@@ -4,10 +4,10 @@ public class Mover : MonoBehaviour
 {
     public MovementManager MovementManager;
     public TickInfoReference TickInfo;
+    public Vector3Int TargetPosition;
+    public Vector3Int CurrentPosition;
 
     ActionScript actionScript;
-    Vector3Int TargetPosition;
-    Vector3Int CurrentPosition;
 
     void Awake()
     {
@@ -31,39 +31,21 @@ public class Mover : MonoBehaviour
 
     void Update()
     {
-        transform.position = Vector3.Lerp(CurrentPosition, TargetPosition, TickInfo.InterpolatedTime);
         if (TickInfo.Ticking)
         {
             Tick();
         }
+        transform.position = Vector3.Lerp(CurrentPosition, TargetPosition, TickInfo.InterpolatedTime);
     }
 
     public void Tick()
     {
         CurrentPosition = TargetPosition;
-        transform.position = TargetPosition;
 
-        if (actionScript && actionScript.TryGetNextAction(out var offset))
+        if (actionScript && actionScript.TryGetNextAction(out var action))
         {
-            TargetPosition += offset;
+            TargetPosition += action.Offset();
         }
-        //else switch (Random.Range(0, 4))
-        //{
-        //    case 0:
-        //        TargetPosition += new Vector3Int(1, 0, 0);
-        //        break;
-        //    case 1:
-        //        TargetPosition += new Vector3Int(-1, 0, 0);
-        //        break;
-        //    case 2:
-        //        TargetPosition += new Vector3Int(0, 0, 1);
-        //        break;
-        //    case 3:
-        //        TargetPosition += new Vector3Int(0, 0, -1);
-        //        break;
-        //}
-
-        
     }
 
     public void SetTargetPosition(Vector3Int targetPosition)
