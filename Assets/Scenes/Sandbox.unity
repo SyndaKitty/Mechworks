@@ -536,9 +536,64 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5340957506993759334, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957506993759334, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957506993759334, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 240239515, guid: ac8f12058f65b7d4c998e941e38a271d, type: 3}
       propertyPath: MovementManager
       value: 
       objectReference: {fileID: 1915070864}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[0].Action
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[1].Action
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[2].Action
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[3].Action
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[0].Iterations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[4].Iterations
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5340957507089098746, guid: ac8f12058f65b7d4c998e941e38a271d,
+        type: 3}
+      propertyPath: ScriptLines.Array.data[4].Action
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac8f12058f65b7d4c998e941e38a271d, type: 3}

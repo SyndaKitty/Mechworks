@@ -11,11 +11,6 @@ public class MovementManager : MonoBehaviour
     readonly Dictionary<DirectionalKey, int> directionalLookup = new Dictionary<DirectionalKey, int>();
     #endregion MovementTracking
 
-    void Start()
-    {
-        
-    }
-
     void LateUpdate()
     {
         CheckMovements();
@@ -41,18 +36,39 @@ public class MovementManager : MonoBehaviour
         return true;
     }
 
-    public void RequestMovement(Mover mover, Vector3Int targetLocation, Action action)
+    public void RequestMovement(Mover mover, Vector3Int currentLocation, Vector3Int targetLocation, Action action)
     {
-        var movement = new Movement(mover, targetLocation, action);
+        // Validate it's a move we handle
+        if (action != Action.Down || action != Action.Left || action != Action.Left || action != Action.Right) return;
 
+        var movement = new Movement(mover, currentLocation, targetLocation, action);
         requestedMovements.Add(movement);
+
+        // Check for moves that are in line behind this one
+        var lookBehind = new DirectionalKey(currentLocation, action);
+        if (directionalLookup.TryGetValue(lookBehind, out var index))
+        {
+            movement.IsAhead = true;
+            requestedMovements[index].IsBehind = true;
+        }
+
+        // Check for moves that are in line ahead of this one
+        var lookAhead = new DirectionalKey(targetLocation + targetLocation - currentLocation, action);
+        if (directionalLookup.TryGetValue(lookAhead, out index))
+        {
+            movement.IsBehind = true;
+            requestedMovements[index].IsAhead = true;
+        }
 
         directionalLookup.Add(new DirectionalKey(targetLocation, action), requestedMovements.Count);
     }
 
     void CheckMovements()
     {
+        foreach (var movement in requestedMovements)
+        {
 
+        }
     }
 }
 
@@ -66,9 +82,10 @@ class Movement
     public bool IsAhead;
     public bool IsBehind;
 
-    public Movement(Mover mover, Vector3Int targetPosition, Action action)
+    public Movement(Mover mover, Vector3Int currentPosition, Vector3Int targetPosition, Action action)
     {
         Mover = mover;
+        FromPosition = currentPosition;
         TargetPosition = targetPosition;
         Action = action;
     }
