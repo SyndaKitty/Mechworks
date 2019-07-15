@@ -14,6 +14,7 @@ public class Mover : MonoBehaviour
 
     void Awake()
     {
+        DesiredAction = Action.Wait;
         actionScript = GetComponent<ActionScript>();
 
         Vector3Int place = new Vector3Int(

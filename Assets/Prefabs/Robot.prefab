@@ -110,6 +110,10 @@ MonoBehaviour:
   MovementManager: {fileID: 0}
   TickInfo:
     Variable: {fileID: 11400000, guid: 8cfd18b28aa0bf043a5676ae7b46e7cd, type: 2}
+  TargetPosition: {x: 0, y: 0, z: 0}
+  CurrentPosition: {x: 0, y: 0, z: 0}
+  DesiredAction: 0
+  MovementSuccessful: 0
 --- !u!114 &5340957507089098746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,13 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TickInfo:
     Variable: {fileID: 11400000, guid: 8cfd18b28aa0bf043a5676ae7b46e7cd, type: 2}
-  Repeat: 1
+  Repeat: 0
   ScriptLines:
-  - Iterations: 2
+  - Iterations: 1
     Action: 0
-  - Iterations: 2
-    Action: 3
-  - Iterations: 2
-    Action: 1
-  - Iterations: 2
-    Action: 2
