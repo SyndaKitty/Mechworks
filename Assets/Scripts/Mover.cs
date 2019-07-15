@@ -4,8 +4,11 @@ public class Mover : MonoBehaviour
 {
     public MovementManager MovementManager;
     public TickInfoReference TickInfo;
+
     public Vector3Int TargetPosition;
     public Vector3Int CurrentPosition;
+    public Action DesiredAction;
+    public bool MovementSuccessful;
 
     ActionScript actionScript;
 
@@ -41,15 +44,10 @@ public class Mover : MonoBehaviour
     public void Tick()
     {
         CurrentPosition = TargetPosition;
-
         if (actionScript && actionScript.TryGetNextAction(out var action))
         {
-            TargetPosition += action.Offset();
+            DesiredAction = action;
+            MovementManager.RequestMovement(this, CurrentPosition, CurrentPosition + action.Offset(), action);
         }
-    }
-
-    public void SetTargetPosition(Vector3Int targetPosition)
-    {
-        TargetPosition = targetPosition;
     }
 }

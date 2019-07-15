@@ -1,19 +1,38 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MovementManager : MonoBehaviour
 {
+    // Input
+    public TickInfo TickInfo;
+
+    // Mover info
     readonly List<Mover> movers = new List<Mover>();
-    readonly Dictionary<Vector3Int, Mover> moverLookup = new Dictionary<Vector3Int, Mover>();
+    readonly Dictionary<Vector3Int, Mover> obstacleLookup = new Dictionary<Vector3Int, Mover>();
 
-    #region MovementTracking
+    // Debug
+    List<Vector3Int> debugObstacles = new List<Vector3Int>();
+
+    // Movement tracking
     readonly List<Movement> requestedMovements = new List<Movement>();
-    readonly Dictionary<DirectionalKey, int> directionalLookup = new Dictionary<DirectionalKey, int>();
-    #endregion MovementTracking
+    readonly Dictionary<Vector3Int, Movement> movementLookup = new Dictionary<Vector3Int, Movement>();
+    readonly Dictionary<Vector3Int, Vector3Int> movementDependency = new Dictionary<Vector3Int, Vector3Int>();
 
-    void LateUpdate()
+    // Statics
+    static readonly Vector3Int[] Directions = new[] {new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), new Vector3Int(0, 0, -1), new Vector3Int(0, 0, 1)};
+
+    void Update()
     {
-        CheckMovements();
+        if (TickInfo.Ticking)
+        {
+            CheckMovements();
+            WriteResults();
+
+            debugObstacles = obstacleLookup.Keys.ToList();
+
+            ClearMovementData();
+        }
     }
 
     /// <summary>
@@ -25,49 +44,143 @@ public class MovementManager : MonoBehaviour
     /// <returns></returns>
     public bool RegisterMover(Mover mover, Vector3Int place)
     {
-        if (moverLookup.ContainsKey(place))
+        if (obstacleLookup.ContainsKey(place))
         {
             return false;
         }
 
         movers.Add(mover);
-        moverLookup.Add(place, mover);
+        obstacleLookup.Add(place, mover);
 
         return true;
     }
 
-    public void RequestMovement(Mover mover, Vector3Int currentLocation, Vector3Int targetLocation, Action action)
+    public void RequestMovement(Mover mover, Vector3Int start, Vector3Int destination, Action action)
     {
         // Validate it's a move we handle
-        if (action != Action.Down || action != Action.Left || action != Action.Left || action != Action.Right) return;
+        if (action >= Action.Wait) return;
 
-        var movement = new Movement(mover, currentLocation, targetLocation, action);
+        var movement = new Movement(mover, start, destination, action);
         requestedMovements.Add(movement);
-
-        // Check for moves that are in line behind this one
-        var lookBehind = new DirectionalKey(currentLocation, action);
-        if (directionalLookup.TryGetValue(lookBehind, out var index))
-        {
-            movement.IsAhead = true;
-            requestedMovements[index].IsBehind = true;
-        }
-
-        // Check for moves that are in line ahead of this one
-        var lookAhead = new DirectionalKey(targetLocation + targetLocation - currentLocation, action);
-        if (directionalLookup.TryGetValue(lookAhead, out index))
-        {
-            movement.IsBehind = true;
-            requestedMovements[index].IsAhead = true;
-        }
-
-        directionalLookup.Add(new DirectionalKey(targetLocation, action), requestedMovements.Count);
+        movementLookup.Add(movement.Start, movement);
     }
 
     void CheckMovements()
     {
         foreach (var movement in requestedMovements)
         {
+            // Chaining - Handle multiple movers moving in a chain
+            if (obstacleLookup.TryGetValue(movement.Destination, out var obstacle))
+            {
+                // If there is a mover in the way, and it's not moving in the same direction: block
+                if (obstacle.DesiredAction != movement.Action)
+                {
+                    BlockMovement(movement);
+                } 
+                // If the mover in front of us is already blocked, so are we
+                else if (movementLookup.TryGetValue(movement.Destination, out var destMovement) && destMovement.Blocked)
+                {
+                    BlockMovement(movement);
+                }
+                else
+                {
+                    // Record dependency
+                    movementDependency.Add(movement.Start, movement.Destination);
+                }
+            }
+            // Collision - Handle multiple movers trying to move into same space
+            else
+            {
+                // Check for other movers
+                var direction = movement.Start - movement.Destination;
+                foreach (var otherDirection in Directions)
+                {
+                    if (direction == otherDirection) continue;
+                    var otherOrigin = movement.Destination + otherDirection;
+                    if (movementLookup.TryGetValue(otherOrigin, out var otherMovement) && otherMovement.Destination == movement.Destination)
+                    {
+                        if (!otherMovement.Blocked)
+                        {
+                            BlockMovement(otherMovement);
+                        }
 
+                        if (!movement.Blocked)
+                        {
+                            BlockMovement(movement);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void WriteResults()
+    {
+        foreach (var movement in requestedMovements)
+        {
+            // Tell movers if they were able to move
+            if (movement.Blocked)
+            {
+                movement.Mover.MovementSuccessful = false;
+                movement.Mover.CurrentPosition = movement.Start;
+                movement.Mover.TargetPosition = movement.Start;
+            }
+            else
+            {
+                movement.Mover.MovementSuccessful = true;
+                movement.Mover.CurrentPosition = movement.Start;
+                movement.Mover.TargetPosition = movement.Destination;
+                
+                // Recalculate positions
+                var behind = movement.Start + movement.Start - movement.Destination;
+                obstacleLookup.Remove(movement.Start);
+            }
+        }
+
+        foreach (var movement in requestedMovements)
+        {
+            if (movement.Blocked) continue;
+            obstacleLookup[movement.Destination] = movement.Mover;
+        }
+    }
+
+    void ClearMovementData()
+    {
+        requestedMovements.Clear();
+        movementLookup.Clear();
+        movementDependency.Clear();
+    }
+
+    void BlockMovement(Movement movement)
+    {
+        while (true)
+        {
+            // Prevent duplicate calls
+            if (movement.Blocked) return;
+            movement.Blocked = true;
+            // Check behind the mover
+            var behind = movement.Start + movement.Start - movement.Destination;
+            if (movementDependency.TryGetValue(behind, out var origin))
+            {
+                // Propagate blocking down the chain
+                movement = movementLookup[behind];
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        var color = Color.yellow;
+        color.a = 0.3f;
+        Gizmos.color = color;
+
+        foreach (var obstacle in debugObstacles)
+        {
+            Gizmos.DrawCube(obstacle, Vector3.one);
         }
     }
 }
@@ -76,43 +189,19 @@ public class MovementManager : MonoBehaviour
 class Movement
 {
     public Mover Mover;
-    public Vector3Int FromPosition;
-    public Vector3Int TargetPosition;
+    public Vector3Int Start;
+    public Vector3Int Destination;
     public Action Action;
-    public bool IsAhead;
-    public bool IsBehind;
+    public bool Blocked;
 
-    public Movement(Mover mover, Vector3Int currentPosition, Vector3Int targetPosition, Action action)
+    public Movement(Mover mover, Vector3Int start, Vector3Int destination, Action action)
     {
         Mover = mover;
-        FromPosition = currentPosition;
-        TargetPosition = targetPosition;
-        Action = action;
-    }
-}
-
-struct DirectionalKey : IEqualityComparer<DirectionalKey>
-{
-    public Action Action;
-    public Vector3Int Destination;
-
-    public DirectionalKey(Vector3Int destination, Action action)
-    {
+        Start = start;
         Destination = destination;
         Action = action;
-    }
-
-    public bool Equals(DirectionalKey x, DirectionalKey y)
-    {
-        return x.Action == y.Action && x.Destination.Equals(y.Destination);
-    }
-
-    public int GetHashCode(DirectionalKey obj)
-    {
-        unchecked
-        {
-            return ((int)obj.Action * 397) ^ obj.Destination.GetHashCode();
-        }
+        Blocked = false;
     }
 }
+
 #endregion
