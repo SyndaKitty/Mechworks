@@ -12,7 +12,7 @@ public class MovementManager : MonoBehaviour
     readonly Dictionary<Vector3Int, Mover> obstacleLookup = new Dictionary<Vector3Int, Mover>();
 
     // Debug
-    List<Vector3Int> debugObstacles = new List<Vector3Int>();
+    //List<Vector3Int> debugObstacles = new List<Vector3Int>();
 
     // Movement tracking
     readonly List<Movement> requestedMovements = new List<Movement>();
@@ -29,7 +29,7 @@ public class MovementManager : MonoBehaviour
             CheckMovements();
             WriteResults();
 
-            debugObstacles = obstacleLookup.Keys.ToList();
+            //debugObstacles = obstacleLookup.Keys.ToList();
 
             ClearMovementData();
         }
@@ -103,7 +103,7 @@ public class MovementManager : MonoBehaviour
                 foreach (var otherDirection in Directions)
                 {
                     if (direction == otherDirection) continue;
-                    print(direction + " " + otherDirection);
+                    //print(direction + " " + otherDirection);
                     var otherOrigin = movement.Destination + otherDirection;
                     if (movementLookup.TryGetValue(otherOrigin, out var otherMovement) && otherMovement.Destination == movement.Destination)
                     {
@@ -184,17 +184,17 @@ public class MovementManager : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
-    {
-        var color = Color.yellow;
-        color.a = 0.3f;
-        Gizmos.color = color;
+    //void OnDrawGizmos()
+    //{
+    //    var color = Color.yellow;
+    //    color.a = 0.3f;
+    //    Gizmos.color = color;
 
-        foreach (var obstacle in debugObstacles)
-        {
-            Gizmos.DrawCube(obstacle, Vector3.one);
-        }
-    }
+    //    foreach (var obstacle in debugObstacles)
+    //    {
+    //        Gizmos.DrawCube(obstacle, Vector3.one);
+    //    }
+    //}
 }
 
 #region Movement Specific Data Structures
