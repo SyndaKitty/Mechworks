@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -17,6 +15,15 @@ public class CameraController : MonoBehaviour
     Vector3 targetAnchor;
     Vector3 currentAnchor;
 
+    float maxZoomFactor;
+    void Awake()
+    {
+        foreach (var zf in DistanceCurve.keys)
+        {
+            if (zf.time > maxZoomFactor) maxZoomFactor = zf.time;
+        }
+    }
+
     void Update()
     {
         // Calculate anchor
@@ -24,9 +31,8 @@ public class CameraController : MonoBehaviour
         currentAnchor = Vector3.Lerp(currentAnchor, targetAnchor, 1f - Mathf.Exp(-Sharpness * Time.deltaTime));
 
         // Calculate zoom factor
-        targetZoomFactor = Mathf.Clamp01(targetZoomFactor + Input.GetAxisRaw("Mouse ScrollWheel") * ZoomSpeed);
+        targetZoomFactor = Mathf.Clamp(targetZoomFactor + Input.GetAxisRaw("Mouse ScrollWheel") * ZoomSpeed, 0, maxZoomFactor);
         currentZoomFactor = Mathf.Lerp(currentZoomFactor, targetZoomFactor, 1f - Mathf.Exp(-ZoomSharpness * Time.deltaTime));
-        print(currentZoomFactor);
 
         // Evaluate curves for zoom
         Quaternion rotation = Quaternion.Euler(AngleCurve.Evaluate(currentZoomFactor), 0, 0);

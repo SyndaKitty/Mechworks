@@ -3,16 +3,8 @@ using UnityEngine;
 
 public class ActionScript : MonoBehaviour
 {
-    public TickInfoReference TickInfo;
     public bool Repeat;
     public ScriptLine[] ScriptLines;
-
-    readonly Vector3Int[] OffsetFromAction = new []
-    {
-        new Vector3Int(0, 0, 1), new Vector3Int(0, 0, -1),
-        new Vector3Int(-1, 0, 0), new Vector3Int(1, 0, 0),
-        Vector3Int.zero
-    };
 
     int movementIndex;
     int step;

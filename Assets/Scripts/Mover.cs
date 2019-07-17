@@ -29,6 +29,7 @@ public class Mover : MonoBehaviour
         }
         else
         {
+            print("Not enough space for " + gameObject.name);
             Destroy(gameObject);
         }
     }
