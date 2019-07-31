@@ -37,7 +37,6 @@ public class ConveyorBelt : MonoBehaviour
         var layer = 1 << LayerMask.NameToLayer("Item");
         if (Physics.Raycast(ray, out var hitInfo, 1, layer))
         {
-            print("asd");
             Item = hitInfo.transform;
         }
         else
@@ -57,7 +56,6 @@ public class ConveyorBelt : MonoBehaviour
 
             if (TickInfo.Ticking)
             {
-                print($"Requesting movement for {GridPosition} {Direction}");
                 BeltManager.MoveItem(GridPosition, Direction, Item);
             }
         }

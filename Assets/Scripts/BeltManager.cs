@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class BeltManager : MonoBehaviour
@@ -23,7 +21,7 @@ public class BeltManager : MonoBehaviour
         foreach (var movement in itemMovements)
         {
             if (movement.Blocked) continue;
-            print($"Removing item from {movement.Origin}");
+            //print($"Removing item from {movement.Origin}");
             belts[movement.Origin].Item = null;
         }
         
@@ -31,7 +29,7 @@ public class BeltManager : MonoBehaviour
         foreach (var movement in itemMovements)
         {
             if (movement.Blocked) continue;
-            print($"Added item to {movement.Destination}");
+            //print($"Added item to {movement.Destination}");
             belts[movement.Destination].Item = movement.Item;
         }
 
@@ -60,11 +58,48 @@ public class BeltManager : MonoBehaviour
             {
                 if (aheadMovement.Blocked)
                 {
+                    //print("Ahead is blocked (origin: " + movement.Origin + ")");
                     BlockMovement(movement.Origin);
                 }
                 else
                 {
+                    //print("Adding dependency from " + movement.Origin + " to " + movement.Destination);
                     movementDependency.Add(movement.Origin, movement.Destination);
+                }
+            }
+
+            // Check priority
+            if (!movement.Blocked)
+            {
+                var center = movement.Destination;
+                var centerBelt = belts[center];
+                //print($"Center: {center}");
+                
+                // Get surrounding positions in order of priority
+                var behind = center + centerBelt.Direction.Opposite().Vector3Int();
+                var clockwise = center + centerBelt.Direction.Clockwise().Vector3Int();
+                var counterClockwise = center + centerBelt.Direction.CounterClockwise().Vector3Int();
+                var front = center + centerBelt.Direction.Vector3Int();
+
+                ItemMovement[] priorityMovements = new ItemMovement[4];
+                
+                priorityMovements[0] = movementLookup.ContainsKey(behind) ? movementLookup[behind] : null;
+                priorityMovements[1] = movementLookup.ContainsKey(clockwise) ? movementLookup[clockwise] : null;
+                priorityMovements[2] = movementLookup.ContainsKey(counterClockwise) ? movementLookup[counterClockwise] : null;
+                priorityMovements[3] = movementLookup.ContainsKey(front) ? movementLookup[front] : null;
+
+                bool foundGoodMovement = false;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (priorityMovements[i] == null || priorityMovements[i].Destination != center) continue;
+                    if (!foundGoodMovement && !priorityMovements[i].Blocked)
+                    {
+                        foundGoodMovement = true;
+                    }
+                    else
+                    {
+                        BlockMovement(priorityMovements[i].Origin);
+                    }
                 }
             }
         }
@@ -79,7 +114,7 @@ public class BeltManager : MonoBehaviour
 
     public void BlockMovement(Vector3Int origin)
     {
-        print("Blocking " + origin);
+        //print("Blocking " + origin);
         var movement = movementLookup[origin];
         if (movement.Blocked) return;
 
@@ -88,7 +123,7 @@ public class BeltManager : MonoBehaviour
         originsToBeProcessed.Push(origin);
         movement.Blocked = true;
 
-        // Process all blocks in chain`
+        // Process all blocks in chain
         while (originsToBeProcessed.Count > 0)
         {
             // Pop movement off the stack
@@ -100,24 +135,22 @@ public class BeltManager : MonoBehaviour
             {
                 // Ignore blocking in the direction we're going
                 if (movement.Direction == dir) continue;
-                if (movementDependency.TryGetValue(origin + dir.Vector3Int(), out var behindOrigin))
+                //print("Checking " + (origin + dir.Vector3Int()));
+                var behindOrigin = origin + dir.Vector3Int();
+                if (movementDependency.ContainsKey(behindOrigin))
                 {
                     var behindMovement = movementLookup[behindOrigin];
+                    //print("Found dependency: " + behindMovement.Direction + " " + behindMovement.Blocked + " " + dir.Opposite());
                     // If it's moving to us, then it needs to be blocked
                     if (behindMovement.Direction == dir.Opposite() && !behindMovement.Blocked)
                     {
+                        //print("Blocking " + behindOrigin);
                         behindMovement.Blocked = true;
                         originsToBeProcessed.Push(behindOrigin);
                     }
                 }
             }
         }
-
-        //var behind = movement.Origin - movement.Direction.Vector3Int();
-        //if (movementLookup.TryGetValue(behind, out var behindMovement))
-        //{
-        //    BlockMovement();
-        //}
     }
 
     public bool Register(ConveyorBelt belt)
@@ -138,6 +171,13 @@ public class BeltManager : MonoBehaviour
         ItemMovement movement = new ItemMovement(origin, direction, item);
         itemMovements.Add(movement);
         movementLookup[origin] = movement;
+
+        // Check for special case of two conveyors facing each other
+        if (movementLookup.TryGetValue(movement.Destination, out var destMovement) && destMovement.Destination == movement.Origin)
+        {
+            BlockMovement(movement.Origin);
+            BlockMovement(movement.Destination);
+        }
     }
 }
 

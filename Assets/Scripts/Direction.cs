@@ -46,4 +46,14 @@ public static class DirectionExtensions
     {
         return (Direction) (((int) dir + 2) % 4);
     }
+
+    public static Direction Clockwise(this Direction dir)
+    {
+        return (Direction)(((int)dir + 3) % 4);
+    }
+
+    public static Direction CounterClockwise(this Direction dir)
+    {
+        return (Direction)(((int)dir + 1) % 4);
+    }
 }
