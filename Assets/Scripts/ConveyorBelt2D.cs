@@ -16,9 +16,6 @@ public class ConveyorBelt2D : MonoBehaviour
     // Instantiation
     public GameObject SpawnItem;
 
-    // Visuals
-    public Sprite[] Sprites;
-
     void Awake()
     {
         // Snap to grid
@@ -38,7 +35,7 @@ public class ConveyorBelt2D : MonoBehaviour
         // Spawn item
         if (SpawnItem)
         {
-            Item = Instantiate(SpawnItem).transform;
+            Item = Instantiate(SpawnItem, transform.position, Quaternion.identity).transform;
         }
     }
 
@@ -53,15 +50,9 @@ public class ConveyorBelt2D : MonoBehaviour
 
             if (TickInfo.Ticking)
             {
-                print("Trying to move");
                 BeltManager.MoveItem(GridPosition, Direction, Item);
             }
         }
-    }
-
-    public void SetSprite()
-    {
-        GetComponent<SpriteRenderer>().sprite = Sprites[(int)Direction % 2];
     }
 
     void OnDrawGizmosSelected()

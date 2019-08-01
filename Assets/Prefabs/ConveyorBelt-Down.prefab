@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 969273220057037178}
   - component: {fileID: 969273220057036933}
   - component: {fileID: 969273220057036932}
-  - component: {fileID: 969273220057037179}
+  - component: {fileID: 754690054}
   m_Layer: 0
-  m_Name: ConveyorBelt
+  m_Name: ConveyorBelt-Down
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 969273220057036935}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -72,7 +72,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7715852853081583841, guid: b3ac8ce51d9245b409aee0498a8f6b5a,
+  m_Sprite: {fileID: 7278506398573462874, guid: 81172578c36b2ea4a8a9db3c30b672b7,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -99,29 +99,30 @@ MonoBehaviour:
   TickInfo: {fileID: 11400000, guid: 8cfd18b28aa0bf043a5676ae7b46e7cd, type: 2}
   BeltManager: {fileID: 0}
   GridPosition: {x: 0, y: 0, z: 0}
-  Direction: 0
+  Direction: 3
   Moving: 0
   Item: {fileID: 0}
   SpawnItem: {fileID: 0}
-  Sprites:
-  - {fileID: 7715852853081583841, guid: b3ac8ce51d9245b409aee0498a8f6b5a, type: 3}
-  - {fileID: 7278506398573462874, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
---- !u!95 &969273220057037179
-Animator:
-  serializedVersion: 3
+--- !u!114 &754690054
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 969273220057036935}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13cea0cef12909d478f5ba7414b67d44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TickInfo: {fileID: 11400000, guid: 8cfd18b28aa0bf043a5676ae7b46e7cd, type: 2}
+  Sprites:
+  - {fileID: 7278506398573462874, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: 7934349249095946147, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: -4595273766353969546, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: 1043118874458187468, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: 7830032567232944765, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: 1536429555242105350, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: -7354724671392915118, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  - {fileID: -8953472713790181107, guid: 81172578c36b2ea4a8a9db3c30b672b7, type: 3}
+  Speed: -4
